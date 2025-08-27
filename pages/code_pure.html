@@ -5,6 +5,7 @@
     <title>代码文本</title>
 </head>
 <body>
+<p>You have encountered an unexpected error while loading this file. This might lead to crucial loss of data.Please try again later.</p>
 <pre><code>#include &lt;cstdio&gt;
 #include &lt;cstring&gt;
 #include &lt;cassert&gt;
@@ -15,12 +16,9 @@
 using namespace std;
 
 const int MAXN = 30000000 + 5;
-// const int READLINES = 1109153;
-// const int MAXM = 30000000 + 5;
-// unknown READLINES and MAXM !
 
 struct DestSeg{
-    int st, ed; // dest[st..ed-1]
+    int st, ed;
     DestSeg *nxt;
 };
 struct Node{
@@ -28,7 +26,7 @@ struct Node{
     int deg_o;
 };
 
-int id[MAXN]; // id for calculation, not the original id
+int id[MAXN];
 Node nodes[MAXN]; int n;
 Node *getnode(int x){
     if (!id[x]){
@@ -38,20 +36,15 @@ Node *getnode(int x){
     return &amp;nodes[id[x]];
 }
 
-// DestSeg seg[READLINES]; int n_seg;
-// int dest[MAXM]; int m;
 vector&lt;int&gt; dest; int m;
 void add_edge(int u, int v){
     Node *u_node = getnode(u), *v_node = getnode(v);
     if (u_node-&gt;head &amp;&amp; u_node-&gt;head-&gt;ed == m){
-        // dest[m++] = id[v];
         dest.push_back(id[v]); m++;
         u_node-&gt;head-&gt;ed++;
     }
     else {
-        // DestSeg *newseg = &amp;seg[n_seg++];
         DestSeg *newseg = new DestSeg;
-        // dest[newseg-&gt;st = m++] = id[v];
         newseg-&gt;st = m++;
         dest.push_back(id[v]);
         newseg-&gt;ed = m;
@@ -59,12 +52,10 @@ void add_edge(int u, int v){
         u_node-&gt;head = newseg;
     }
     u_node-&gt;deg_o++;
-    // assert(m &lt;= MAXM);
 }
 
 FILE *fp;
 const int BUFSIZE = 1&lt;&lt;16;
-// #define my_getchar getchar
 char my_getchar(){
     static char buf[BUFSIZE+5];
     static int pos = 0, size = 0;
@@ -72,17 +63,10 @@ char my_getchar(){
         pos = 0;
         size = fread(buf, 1, BUFSIZE, fp);
         if (size == 0) return EOF;
-================================== ERROR ==================================
-
-You have encountered an unexpected error while loading this file. This might lead to crucial loss of data.
-Please try again later.
-
-================================== ERROR ==================================
     }
     return buf[pos++];
 }
 void load_graph(){
-    // fp = fopen(&quot;wiki.graph&quot;, &quot;r&quot;);
     fp = stdin;
     while (1){
         char ch;
@@ -93,10 +77,10 @@ void load_graph(){
                 x = x * 10 + ch - &#x27;0&#x27;;
             else {
                 if (x == 0)
-                    continue; // EOF or sth like &#x27;A:\n&#x27;
+                    continue;
                 if (head == -1){
                     head = x;
-                    getnode(head); // register the node even if sth like &#x27;A:\n&#x27;
+                    getnode(head);
                 } else
                     add_edge(head, x);
                 x = 0;
@@ -107,7 +91,6 @@ void load_graph(){
     }
 }
 
-// #define double long double
 double pagerank[MAXN], pagerank_[MAXN];
 void calc_pagerank(double alpha = 0.15, double num_loop = 40){
     double tmp = 1.0 / n;
@@ -134,7 +117,6 @@ void calc_pagerank(double alpha = 0.15, double num_loop = 40){
 void output(){
     for (int i = 1; i &lt; MAXN; ++i)
         if (id[i])
-            // printf(&quot;%d %.10Lf\n&quot;, i, pagerank[id[i]]);
             printf(&quot;%d %.10lf\n&quot;, i, pagerank[id[i]]);
 }
 
@@ -142,9 +124,6 @@ int main(){
     load_graph();
     calc_pagerank(0.15, 100);
     output();
-
-    // printf(&quot;n = %d\n&quot;, n); // 3720182
-    // printf(&quot;m = %d\n&quot;, m); // 25982901
     return 0;
 }</code></pre>
 </body>
