@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>代码文本</title>
+</head>
+<body>
+<pre><code>#include &lt;cstdio&gt;
+#include &lt;cstring&gt;
+#include &lt;cassert&gt;
+#include &lt;algorithm&gt;
+#include &lt;set&gt;
+#include &lt;map&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+const int MAXN = 30000000 + 5;
+// const int READLINES = 1109153;
+// const int MAXM = 30000000 + 5;
+// unknown READLINES and MAXM !
+
+struct DestSeg{
+    int st, ed; // dest[st..ed-1]
+    DestSeg *nxt;
+};
+struct Node{
+    DestSeg *head;
+    int deg_o;
+};
+
+int id[MAXN]; // id for calculation, not the original id
+Node nodes[MAXN]; int n;
+Node *getnode(int x){
+    if (!id[x]){
+        id[x] = ++n;
+        assert(n &lt;= MAXN);
+    }
+    return &amp;nodes[id[x]];
+}
+
+// DestSeg seg[READLINES]; int n_seg;
+// int dest[MAXM]; int m;
+vector&lt;int&gt; dest; int m;
+void add_edge(int u, int v){
+    Node *u_node = getnode(u), *v_node = getnode(v);
+    if (u_node-&gt;head &amp;&amp; u_node-&gt;head-&gt;ed == m){
+        // dest[m++] = id[v];
+        dest.push_back(id[v]); m++;
+        u_node-&gt;head-&gt;ed++;
+    }
+    else {
+        // DestSeg *newseg = &amp;seg[n_seg++];
+        DestSeg *newseg = new DestSeg;
+        // dest[newseg-&gt;st = m++] = id[v];
+        newseg-&gt;st = m++;
+        dest.push_back(id[v]);
+        newseg-&gt;ed = m;
+        newseg-&gt;nxt = u_node-&gt;head;
+        u_node-&gt;head = newseg;
+    }
+    u_node-&gt;deg_o++;
+    // assert(m &lt;= MAXM);
+}
+
+FILE *fp;
+const int BUFSIZE = 1&lt;&lt;16;
+// #define my_getchar getchar
+char my_getchar(){
+    static char buf[BUFSIZE+5];
+    static int pos = 0, size = 0;
+    if (pos == size){
+        pos = 0;
+        size = fread(buf, 1, BUFSIZE, fp);
+        if (size == 0) return EOF;
+================================== ERROR ==================================
+
+You have encountered an unexpected error while loading this file. This might lead to crucial loss of data.
+Please try again later.
+
+================================== ERROR ==================================
+    }
+    return buf[pos++];
+}
+void load_graph(){
+    // fp = fopen(&quot;wiki.graph&quot;, &quot;r&quot;);
+    fp = stdin;
+    while (1){
+        char ch;
+        int x = 0, head = -1;
+        do{
+            ch = my_getchar();
+            if (ch &gt;= &#x27;0&#x27; &amp;&amp; ch &lt;= &#x27;9&#x27;)
+                x = x * 10 + ch - &#x27;0&#x27;;
+            else {
+                if (x == 0)
+                    continue; // EOF or sth like &#x27;A:\n&#x27;
+                if (head == -1){
+                    head = x;
+                    getnode(head); // register the node even if sth like &#x27;A:\n&#x27;
+                } else
+                    add_edge(head, x);
+                x = 0;
+            }
+        } while (ch != &#x27;\n&#x27; &amp;&amp; ch != EOF);
+        if (ch == EOF)
+            break;
+    }
+}
+
+// #define double long double
+double pagerank[MAXN], pagerank_[MAXN];
+void calc_pagerank(double alpha = 0.15, double num_loop = 40){
+    double tmp = 1.0 / n;
+    for (int i = 1; i &lt;= n; ++i)
+        pagerank[i] = tmp;
+
+    for (int i = 0; i &lt; num_loop; ++i){
+        double sum_scatter = 0;
+        memset(pagerank_, 0, sizeof(pagerank_));
+        for (int u = 1; u &lt;= n; ++u)
+            if (nodes[u].deg_o){
+                double tmp = (1 - alpha) * pagerank[u] / nodes[u].deg_o;
+                for (DestSeg *seg = nodes[u].head; seg; seg = seg-&gt;nxt)
+                    for (int i = seg-&gt;st; i &lt; seg-&gt;ed; ++i)
+                        pagerank_[dest[i]] += tmp;
+            } else
+                sum_scatter += pagerank[u];
+        sum_scatter = (alpha + (1 - alpha) * sum_scatter) / n;
+        for (int i = 1; i &lt;= n; ++i)
+            pagerank[i] = pagerank_[i] + sum_scatter;
+    }       
+}
+
+void output(){
+    for (int i = 1; i &lt; MAXN; ++i)
+        if (id[i])
+            // printf(&quot;%d %.10Lf\n&quot;, i, pagerank[id[i]]);
+            printf(&quot;%d %.10lf\n&quot;, i, pagerank[id[i]]);
+}
+
+int main(){
+    load_graph();
+    calc_pagerank(0.15, 100);
+    output();
+
+    // printf(&quot;n = %d\n&quot;, n); // 3720182
+    // printf(&quot;m = %d\n&quot;, m); // 25982901
+    return 0;
+}</code></pre>
+</body>
+</html>
